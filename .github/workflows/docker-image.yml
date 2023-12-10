@@ -10,7 +10,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  REPO_NAME: $(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
 
 jobs:
 
@@ -69,4 +68,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ env.REGISTRY }}/${REPO_NAME}/simpleservice:latest
+        tags: ${{ env.REGISTRY }}/gschei/simpleservice:latest

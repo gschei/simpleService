@@ -10,6 +10,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  REPO_NAME: $(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
 
 jobs:
 

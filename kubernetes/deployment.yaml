@@ -27,6 +27,8 @@ spec:
           value: "simpleservice-svc"
         - name: SIMPLE_TARGET_PORT
           value: "7777"
+        - name: SPIFFE_ENDPOINT_SOCKET
+          value: "unix:///run/spire/sockets/agent.sock"
         livenessProbe:
           httpGet:
             path: /

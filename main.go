@@ -17,7 +17,11 @@ func initSpiffeServer(ctx context.Context, port string) {
 
 	// export SPIFFE_ENDPOINT_SOCKET=unix:///run/spire/sockets/agent.sock
 
+	fmt.Printf("SPIFFE: start initialization on port %v\n", port)
+
 	clientID := spiffeid.RequireFromString("spiffe://example.org/gilbert/testclient")
+
+	fmt.Printf("SPIFFE: clientID %v\n", clientID)
 
 	listener, err := spiffetls.Listen(ctx, "tcp", "0.0.0.0:"+port, tlsconfig.AuthorizeID(clientID))
 	if err != nil {

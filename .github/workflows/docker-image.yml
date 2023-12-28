@@ -1,0 +1,71 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        fetch-depth: 0
+
+    - name: 'Get latest tag'
+      id: latesttag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      with:
+          fallback: 1.0.0
+
+    - name: increase version
+      run: |
+        echo "git status: $(git status)"
+        LATEST_TAG=${{ steps.latesttag.outputs.tag }}
+        echo "latest tag: ${LATEST_TAG}"
+        IFS='.' read -r -a VERSION_COMPONENTS <<< "$LATEST_TAG"
+        MAJOR="${VERSION_COMPONENTS[0]}"
+        MINOR="${VERSION_COMPONENTS[1]}"
+        PATCH="${VERSION_COMPONENTS[2]}"
+        NEW_PATCH=$((PATCH + 1))
+        VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+        echo "new version: $VERSION"
+        echo "token: $GITHUB_TOKEN"
+        #git tag "$VERSION"
+        #git push origin "$VERSION"
+        #echo "New tag created: $VERSION"
+        
+        
+    - name: Log into registry ${{ env.REGISTRY }}
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}      
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and push Docker image
+      id: build-and-push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ env.REGISTRY }}/gschei/simpleservice:latest

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simpleservice
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: simpleservice
+  template:
+    metadata:
+      labels:
+        app: simpleservice
+    spec:
+      containers:
+      - image: ghcr.io/gschei/simpleservice:latest
+        name: simpleservice
+        env:
+        - name: SIMPLE_LISTEN_PORT
+          value: "7777"
+        - name: SIMPLE_TARGET_HOST
+          value: "simpleservice-svc"
+        - name: SIMPLE_TARGET_PORT
+          value: "7777"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 7777
+
+          
